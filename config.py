@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # title           :config.py
-# description     :pwm control for Sauna Electric Heater Control
+# description     :adapted for lamps and cpu logging
 # author          :David Torrens
 # start date      :2019 12 12
 # version         :0.1
@@ -58,6 +58,7 @@ class class_config:
 		self.ftp_log_max_count  = 5
 		self.ftp_timeout = 0.5
 		self.ftplog = 0		# Number of Value Changes before Log File is Saved to remote website, 0 means every change
+		self.ftp_debug = False
 	# Sauna
 		self.max_temp =  73.0
 		self.min_temp = 67.0
@@ -67,6 +68,9 @@ class class_config:
 		self.max_freq = 4.0
 		self.sauna_GPIO_port = 18
 		self.sensor4readings = "0315a80584ff"
+	# Lamps_and_logging
+		self.latitude = '52.97'
+		self.longitude = '-2.69'
 		
 # End of items set in config.cfg	
 
@@ -90,10 +94,13 @@ class class_config:
 		self.log_directory = config_read.get(section, 'log_directory')
 		self.local_dir_www = config_read.get(section, 'local_dir_www')
 		self.log_buffer_flag = config_read.getboolean(section, 'log_buffer_flag')
-		self.text_buffer_length  = int(config_read.get(section, 'text_buffer_length'))		
+		self.text_buffer_length  = int(config_read.get(section, 'text_buffer_length'))
 		section = "Ftp"
 		self.ftp_creds_filename = config_read.get(section, 'ftp_creds_filename') 
-		self.ftp_log_max_count = float(config_read.get(section, 'ftp_log_max_count'))
+		self.ftp_log_max_count = config_read.getfloat(section, 'ftp_log_max_count')
+		self.ftp_timeout = config_read.getfloat(section, 'ftp_timeout')
+		self.ftplog = config_read.getfloat(section, 'ftplog')
+		self.ftp_debug = config_read.getboolean(section, 'ftp_debug')
 		section = "Sauna"		
 		self.max_temp =  float(config_read.get(section, 'max_temp'))
 		self.min_temp =  float(config_read.get(section, 'min_temp'))
@@ -103,6 +110,9 @@ class class_config:
 		self.max_freq =  float(config_read.get(section, 'max_freq'))
 		self.sauna_GPIO_port =  int(config_read.get(section, 'sauna_GPIO_port'))
 		self.sensor4readings =  str(config_read.get(section, 'sensor4readings'))
+		section = "Lamps_and_logging"
+		self.latitude = float(config_read.get(section, 'latitude'))
+		self.longitude = float(config_read.get(section, 'longitude'))
 		return
 
 	def write_file(self):
@@ -120,8 +130,11 @@ class class_config:
 		config_write.set(section, 'text_buffer_length',self.text_buffer_length)	
 		section = "Ftp"
 		config_write.add_section(section)
-		config_write.set(section, 'ftp_creds_filename',self.ftp_creds_filename)
-		config_write.set(section, 'ftp_log_max_count',self.ftp_log_max_count)
+		config_write.set(section,'ftp_creds_filename',self.ftp_creds_filename)
+		config_write.set(section,'ftp_log_max_count',self.ftp_log_max_count)
+		config_write.set(section,'ftp_timeout', self.ftp_timeout)
+		config_write.set(section,'ftplog',self.ftplog)
+		config_write.set(section,'ftp_debug',self.ftp_debug)
 		section = "Sauna"	
 		config_write.add_section(section)	
 		config_write.set(section, 'max_temp',self.max_temp)
@@ -132,9 +145,12 @@ class class_config:
 		config_write.set(section, 'max_freq',self.max_freq)
 		config_write.set(section, 'sauna_GPIO_port',self.sauna_GPIO_port)
 		config_write.set(section, 'sensor4readings',self.sensor4readings)
+		section = "Lamps_and_logging"
+		config_write.set(section, 'latitude',self.latitude)
+		config_write.set(section, 'longitude',self.longitude)
 		
 		# Writing our configuration file to 'self.config_filename'
-		pr(self.dbug, here, "ready to write new config file with default values: " , self.config_filename)
+		pr(self.debug, here, "ready to write new config file with default values: " , self.config_filename)
 		with open(self.config_filename, 'w+') as configfile:
 			config_write.write(configfile)
 		return 0

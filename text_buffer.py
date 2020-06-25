@@ -50,7 +50,7 @@ class class_text_buffer(object):
 
 		self.__source_ref = 0 # a number used to control prevention repeat messages
 		self.__width = len(headings) + 1                     
-		self.line_values = ["1"]*len(headings)
+		self.line_values = ["not set"]*len(headings)
 		self.__dta = [ [ None for di in range(self.__width+1) ] for dj in range(self.__config.text_buffer_length+1) ]
 		self.__size = 0
 		self.__posn = self.__config.text_buffer_length-1
@@ -106,7 +106,7 @@ class class_text_buffer(object):
 					print("Failed to copy log file to www because this not there: ",self.__www_filename)
 			#send log file to website configevery ten scans
 			if self.__send_log_count > 10 and fileexists(self.__ftp_creds):
-				self.__log.send_log_by_ftp(False,self.__config.log_directory,self.__config.ftp_timeout)
+				self.__log.send_log_by_ftp(self.__config.ftp_debug,self.__config.log_directory,self.__config.ftp_timeout)
 				self.__send_log_count = 0
 			else:
 				self.__send_log_count += 1
@@ -209,18 +209,19 @@ class class_text_buffer(object):
 			copyfile(self.__html_filename, self.__www_filename)
 		except:
 			print("Not able to copy : ",self.__html_filename, " to ", self.__www_filename)
-		
-		
+
 		if fileexists(self.__ftp_creds):
 			if self.__send_html_count >= 3:
-				# To debug FTP change end of following line to " = True"   !!!!!!!!!!!! 
-				FTP_dbug_flag = False
-				ftp_result = send_by_ftp(FTP_dbug_flag,self.__ftp_creds, self.__html_filename_save_as, self.__html_filename,"",self.__config.ftp_timeout)
+				ftp_result = send_by_ftp(self.__config.ftp_debug,self.__ftp_creds, self.__html_filename_save_as, self.__html_filename,"",self.__config.ftp_timeout)
 				for pres_ind in range(0,len(ftp_result)):
-					pr(FTP_dbug_flag,here, str(pres_ind) + " : ", ftp_result[pres_ind])
+					pr(self.__config.ftp_debug,here, str(pres_ind) + " : ", ftp_result[pres_ind])
 				self.__send_html_count = 0
 			else:
 				self.__send_html_count += 1
+		elif self.__config.ftp_debug:
+			print("Debug on but No Ftp Creds File Found")
+		else:
+			print("No FTP Creds File send count is :", self.__send_html_count)
 		return
 
 

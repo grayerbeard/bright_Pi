@@ -43,10 +43,10 @@ from utility import pr,make_time_text,send_by_ftp
 
 class class_buffer_log:
 	def __init__(self,config):
-		self.dbug = False
 		self.__send_plain_count = 5
 		self.__no_heading_yet = True
 		self.__config = config
+		self.debug = self.__config.ftp_debug
 		starttime = datetime.now()
 		timestamp = make_time_text(starttime)
 		self.log_filename = timestamp + "_" + self.__config.prog_name + "_" + "lg.csv"
@@ -70,29 +70,29 @@ class class_buffer_log:
 		
 		return
 		
-	def send_log_by_ftp(self,FTP_dbug_flag,remote_log_dir,ftp_timeout):
+	def send_log_by_ftp(self,FTP_debug_flag,remote_log_dir,ftp_timeout):
 		here = "bffr_log_log_by_ftp"
-		ftp_result = send_by_ftp(FTP_dbug_flag,self.__config.ftp_creds_filename, self.__log_filename_save_as, \
+		ftp_result = send_by_ftp(FTP_debug_flag,self.__config.ftp_creds_filename, self.__log_filename_save_as, \
 			self.log_filename,remote_log_dir,ftp_timeout)
 		for pres_ind in range(0,len(ftp_result)):
-			pr(FTP_dbug_flag,here, str(pres_ind) + " : ", ftp_result[pres_ind])
+			pr(FTP_debug_flag,here, str(pres_ind) + " : ", ftp_result[pres_ind])
 		if self.__send_plain_count < 0 :
-			ftp_result = send_by_ftp(FTP_dbug_flag,self.__config.ftp_creds_filename, self.__log_filename_save_as, \
+			ftp_result = send_by_ftp(FTP_debug_flag,self.__config.ftp_creds_filename, self.__log_filename_save_as, \
 				"log.csv",remote_log_dir,ftp_timeout)
 			for pres_ind in range(0,len(ftp_result)):
-				pr(FTP_dbug_flag,here, str(pres_ind) + " : ", ftp_result[pres_ind])
+				pr(FTP_debug_flag,here, str(pres_ind) + " : ", ftp_result[pres_ind])
 			self.__send_plain_count = 10
 		else:
 			self.__send_plain_count -= 1
 			#print("Send plain count : ",self.__send_plain_count)
 		return
 					
-	def copy_log_to_www(self,dbug_flag):
+	def copy_log_to_www(self,debug_flag):
 		here = "copy_log_to_www"
 		try:
 			# send the same html file to the local web site
 			copyfile(self.__log_filename_save_as, self.__local_www_log_filename)
-			pr(dbug_flag,0, "Sent : " + self.__log_filename_save_as + " to : ", self.__local_www_log_filename)
+			pr(debug_flag,0, "Sent : " + self.__log_filename_save_as + " to : ", self.__local_www_log_filename)
 		except:
 			pr(True,0,"Fail with copy " + self.__log_filename_save_as + " to : ", self.__local_www_log_filename)
 

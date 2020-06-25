@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /home/pi/leds
+cd /home/pi/bright_pi
 echo looking to kill any old tmux leds session
 tmux kill-session -t leds
 echo now new tmux leds session 
