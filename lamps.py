@@ -46,23 +46,28 @@ else : # no file so my_sensorneeds to be written
 
 config.scan_count = 0
 
-headings = ["Count","Cpu Load-%","Temp-C","Cpu Freq-GHz","Cpu Mem-%","Cpu Disk-%","IR Lamp","Hrs to Sunrise","Hrs to Sunset"]
+headings = ["Count","Cpu Load-%","Temp-C","Cpu Freq-GHz","Cpu Mem-%","Cpu Disk-%","IR Lamp","Hrs to Sunrise","Hrs to Sunset","Errors"]
 log_buffer = class_text_buffer(headings,config)
 
 rise_set = class_rise_set(config)
 bright_pi = class_bright_pi_lamps()
 cpu = class_cpu()
+Error_Text = ""
 
-bright_pi.reset()
-print ("IR On")
-bright_pi.IR_on()
-time.sleep(2)
-bright_pi.reset()
-print("IR off White ON")
-bright_pi.WHITE_on()
-time.sleep(2)
-bright_pi.reset()
-print("all off")
+
+try:
+	bright_pi.reset()
+	print ("IR On")
+	bright_pi.IR_on()
+	time.sleep(2)
+	bright_pi.reset()
+	print("IR off White ON")
+	bright_pi.WHITE_on()
+	time.sleep(2)
+	bright_pi.reset()
+	print("all off")
+except:
+	Error_Text = Error_Text + " Lamp Test Fail,"
 
 # Following line for test only
 # rise_set.test_timing_calc()
@@ -75,10 +80,16 @@ while (config.scan_count <= config.max_scans) or (config.max_scans == 0):
 		# print(rise_set.datetime_now.strftime(' Time is :  %H hrs %M min'))
 		if rise_set.night:
 			# print("Its Night Time Turn IR On \n")
-			bright_pi.IR_on()
+			try:
+				bright_pi.IR_on()
+			except:
+				Error_Text = Error_Text + " IR On Fail,"
 		else:
 			# print("Its Day Time Turn IR Off \n")
-			bright_pi.reset()
+			try:
+				bright_pi.reset()
+			except:
+				Error_Text = Error_Text + " IR Off Fail,"			
 		time.sleep(config.scan_delay)
 		# print(datetime.now().strftime(' Time is :  %H hrs %M min'))
 		log_buffer.line_values[0] = str(config.scan_count)
@@ -93,8 +104,11 @@ while (config.scan_count <= config.max_scans) or (config.max_scans == 0):
 			log_buffer.line_values[6] = "Off"
 		log_buffer.line_values[7] = str(round(rise_set.next_rise_time,2))
 		log_buffer.line_values[8] = str(round(rise_set.next_set_time,2))
+		log_buffer.line_values[9] = Error_Text
+		Error_Text = ""
 		buffer_increment_flag = True
 		log_buffer.pr(buffer_increment_flag,0,rise_set.datetime_now,1234)
+
 	except KeyboardInterrupt:
 		print(".........Ctrl+C pressed...")
 		sys_exit()
