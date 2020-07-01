@@ -69,6 +69,7 @@ class class_config:
 		self.sauna_GPIO_port = 18
 		self.sensor4readings = "0315a80584ff"
 	# Lamps_and_logging
+		lamps_control = False
 		self.latitude = '52.97'
 		self.longitude = '-2.69'
 		
@@ -111,6 +112,7 @@ class class_config:
 		self.sauna_GPIO_port =  int(config_read.get(section, 'sauna_GPIO_port'))
 		self.sensor4readings =  str(config_read.get(section, 'sensor4readings'))
 		section = "Lamps_and_logging"
+		self.lamps_control = config_read.getboolean(section, 'lamps_control')
 		self.latitude = float(config_read.get(section, 'latitude'))
 		self.longitude = float(config_read.get(section, 'longitude'))
 		return
@@ -146,6 +148,7 @@ class class_config:
 		config_write.set(section, 'sauna_GPIO_port',self.sauna_GPIO_port)
 		config_write.set(section, 'sensor4readings',self.sensor4readings)
 		section = "Lamps_and_logging"
+		config_write.set(section, 'lamps_control',self.lamps_control)
 		config_write.set(section, 'latitude',self.latitude)
 		config_write.set(section, 'longitude',self.longitude)
 		

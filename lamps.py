@@ -46,7 +46,10 @@ else : # no file so my_sensorneeds to be written
 
 config.scan_count = 0
 
-headings = ["Count","Cpu Load-%","Temp-C","Cpu Freq-GHz","Cpu Mem-%","Cpu Disk-%","IR Lamp","Hrs to Sunrise","Hrs to Sunset","Errors"]
+if config.lamps_control:
+	headings = ["Count","Cpu Load-%","Temp-C","Cpu Freq-GHz","Cpu Mem-%","Cpu Disk-%","IR Lamp","Hrs to Sunrise","Hrs to Sunset","Errors"]
+else:
+	headings = ["Count","Cpu Load-%","Temp-C","Cpu Freq-GHz","Cpu Mem-%","Cpu Disk-%"]
 log_buffer = class_text_buffer(headings,config)
 
 rise_set = class_rise_set(config)
@@ -54,49 +57,49 @@ bright_pi = class_bright_pi_lamps()
 cpu = class_cpu()
 Error_Text = ""
 
+if config.lamps_control:
+	try:
+	#	bright_pi.reset()
+	#	print("IR off White ON")
+	#	bright_pi.WHITE_on()
+	#	time.sleep(20)
+	#	bright_pi.reset()
+	#	print("all off")
+		
 
-try:
-#	bright_pi.reset()
-#	print("IR off White ON")
-#	bright_pi.WHITE_on()
-#	time.sleep(20)
-#	bright_pi.reset()
-#	print("all off")
+	#	print ("IR On")
+	#	bright_pi.IR_on()
+	#	time.sleep(20)
+	#	bright_pi.reset()
+	#	print("IR off White ON")
+	#	bright_pi.WHITE_on()
+	#	time.sleep(10)
+	#	bright_pi.reset()
+	#	print("all off")
 	
+	#	bright_pi.reset()
+	#	print ("IR On")
+	#	bright_pi.IR_on()
+	#	time.sleep(20)
+	#	bright_pi.reset()
+	#	print("IR off White ON")
+	#	bright_pi.WHITE_on()
+	#	time.sleep(10)
+	#	bright_pi.reset()
+	#	print("all off")
 
-#	print ("IR On")
-#	bright_pi.IR_on()
-#	time.sleep(20)
-#	bright_pi.reset()
-#	print("IR off White ON")
-#	bright_pi.WHITE_on()
-#	time.sleep(10)
-#	bright_pi.reset()
-#	print("all off")
-	
-#	bright_pi.reset()
-#	print ("IR On")
-#	bright_pi.IR_on()
-#	time.sleep(20)
-#	bright_pi.reset()
-#	print("IR off White ON")
-#	bright_pi.WHITE_on()
-#	time.sleep(10)
-#	bright_pi.reset()
-#	print("all off")
-
-	bright_pi.reset()
-	print ("IR On")
-	bright_pi.IR_on()
-	time.sleep(20)
-	bright_pi.reset()
-	print("IR off White ON")
-	bright_pi.WHITE_on()
-	time.sleep(10)
-	bright_pi.reset()
-	print("all off")
-except:
-	Error_Text = Error_Text + " Lamp Test Fail,"
+		bright_pi.reset()
+		print ("IR On")
+		bright_pi.IR_on()
+		time.sleep(20)
+		bright_pi.reset()
+		print("IR off White ON")
+		bright_pi.WHITE_on()
+		time.sleep(10)
+		bright_pi.reset()
+		print("all off")
+	except:
+		Error_Text = Error_Text + " Lamp Test Fail,"
 
 # Following line for test only
 # rise_set.test_timing_calc()
@@ -107,15 +110,17 @@ while (config.scan_count <= config.max_scans) or (config.max_scans == 0):
 		rise_set.compute(0)
 		cpu.get_data()
 		# print(rise_set.datetime_now.strftime(' Time is :  %H hrs %M min'))
-		if rise_set.night:
-			print("Its Night Time Turn IR On")
+		if rise_set.night and config.lamps_control:
+			# Following l;ine for debugging only
+			# print("Its Night Time Turn IR On")
 			try:
 				bright_pi.IR_on()
 				log_buffer.line_values[6] = "On"
 			except:
 				Error_Text = Error_Text + " IR On Fail,"
-		else:
-			print("Its Day Time Turn IR Off")
+		elif config.lamps_control:
+			# Following l;ine for debugging only
+			# print("Its Day Time Turn IR Off")
 			try:
 				bright_pi.reset()
 				log_buffer.line_values[6] = "Off"
@@ -130,10 +135,12 @@ while (config.scan_count <= config.max_scans) or (config.max_scans == 0):
 		log_buffer.line_values[4] = str(cpu.cpu_mem) 
 		log_buffer.line_values[5] = str(cpu.cpu_disk)
 
-		log_buffer.line_values[7] = str(round(rise_set.next_rise_time,2))
-		log_buffer.line_values[8] = str(round(rise_set.next_set_time,2))
-		log_buffer.line_values[9] = Error_Text
-		Error_Text = ""
+		if config.lamps_control:
+			log_buffer.line_values[7] = str(round(rise_set.next_rise_time,2))
+			log_buffer.line_values[8] = str(round(rise_set.next_set_time,2))
+			log_buffer.line_values[9] = Error_Text
+			Error_Text = ""
+		
 		buffer_increment_flag = True
 		log_buffer.pr(buffer_increment_flag,0,rise_set.datetime_now,1234)
 

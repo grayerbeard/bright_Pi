@@ -3,14 +3,14 @@
 #
 #   for use with Python 3
 
-#	cpu_037.py
-
 from gpiozero import CPUTemperature
-import RPi.GPIO as GPIO
 import psutil
 import datetime
-import plasma
-import colorsys
+
+#Only needed in fanshim
+#import RPi.GPIO as GPIO
+#import plasma
+#import colorsys
 
 class class_cpu:  # For monitoring R Pi 4 Cpu 
 	def __init__(self):
@@ -23,24 +23,28 @@ class class_cpu:  # For monitoring R Pi 4 Cpu
 		self.this_call = datetime.datetime.now()
 		self.since_last = 0.0
 		self.cpu_freq = psutil.cpu_freq()
-		self.pwm_speed  = 0
-		self.pwm_freq = 2
-		self.pwm_on_time = 100
-		#self.pwm_count = 0
-		GPIO.setmode(GPIO.BCM)
-		GPIO.setup(18, GPIO.OUT)
-		self.pwm_out = GPIO.PWM(18,1)
-		self.pwm_out.start(0)
-		self.pwm_out.ChangeFrequency(self.pwm_freq)
-		self.pwm_out.ChangeDutyCycle(self.pwm_speed)
 
-	def set_pwm_control_fan(self,freq,speed):
-		self.pwm_speed  = speed
-		self.pwm_freq = freq
+#Only Needed in Fanshim
+#		self.pwm_speed  = 0
+#		self.pwm_freq = 2
+#		self.pwm_on_time = 100
+#		#self.pwm_count = 0
+#		GPIO.setmode(GPIO.BCM)
+#		GPIO.setup(18, GPIO.OUT)
+#		self.pwm_out = GPIO.PWM(18,1)
+#		self.pwm_out.start(0)
+#		self.pwm_out.ChangeFrequency(self.pwm_freq)
+#		self.pwm_out.ChangeDutyCycle(self.pwm_speed)
 
-	def control_fan(self):
-		self.pwm_out.ChangeFrequency(self.pwm_freq)
-		self.pwm_out.ChangeDutyCycle(self.pwm_speed)
+#Only needed in Fanshim
+#	def set_pwm_control_fan(self,freq,speed):
+#		self.pwm_speed  = speed
+#		self.pwm_freq = freq
+
+# Only needed in Fanshim
+#	def control_fan(self):
+#		self.pwm_out.ChangeFrequency(self.pwm_freq)
+#		self.pwm_out.ChangeDutyCycle(self.pwm_speed)
 
 	def get_data(self):
 		self.temp = float(self.get_cpu_temp.temperature)
@@ -49,14 +53,15 @@ class class_cpu:  # For monitoring R Pi 4 Cpu
 		self.cpu_disk = psutil.disk_usage('/').percent
 		self.cpu_freq = psutil.cpu_freq()
 
-	def update_led_temperature(self,temp,min_temp,max_temp,brightness):
-		temp = float(temp)
-		temp -= max_temp
-		temp /= float(min_temp - max_temp)
-		temp = max(0, min(1, temp))
-		temp = 1.0 - temp
-		temp *= 120.0
-		temp /= 360.0
-		r, g, b = [int(c * 255.0) for c in colorsys.hsv_to_rgb(temp, 1.0, brightness / 255.0)]
-		plasma.set_light(0, r, g, b)
-		plasma.show()
+# only needed in fanshim
+#	def update_led_temperature(self,temp,min_temp,max_temp,brightness):
+#		temp = float(temp)
+#		temp -= max_temp
+#		temp /= float(min_temp - max_temp)
+#		temp = max(0, min(1, temp))
+#		temp = 1.0 - temp
+#		temp *= 120.0
+#		temp /= 360.0
+#		r, g, b = [int(c * 255.0) for c in colorsys.hsv_to_rgb(temp, 1.0, brightness / 255.0)]
+#		plasma.set_light(0, r, g, b)
+#		plasma.show()

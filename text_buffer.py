@@ -45,8 +45,8 @@ class class_text_buffer(object):
 		#initialization
 		self.__config = config
 		print(" Buffer Init for : ",self.__config.prog_name," with a size of : ",self.__config.text_buffer_length, " and  width of : ", len(headings) + 1, " including time stamp")
-		if not os.path.exists('log'):
-		    os.makedirs('log')
+		if not os.path.exists(self.__config.log_directory):
+			os.makedirs(self.__config.log_directory)
 
 		self.__source_ref = 0 # a number used to control prevention repeat messages
 		self.__width = len(headings) + 1                     
@@ -69,7 +69,14 @@ class class_text_buffer(object):
 		if self.__config.log_buffer_flag:
 			self.__send_log_count = 0
 			self.__log = class_buffer_log(config)
-		
+			if os.path.exists(self.__config.local_dir_www):
+				if not os.path.exists(self.__config.local_dir_www + "/" + self.__config.log_directory):
+					os.makedirs(self.__config.local_dir_www + "/" + self.__config.log_directory)
+					print(self.__config.local_dir_www + "/" + self.__config.log_directory + " directory created")
+			else:
+				print("Logging on but NGINX is not installed or error in Config for local www diirectory")
+				sys_exit()
+
 	def size(self):
 		return self.__config.text_buffer_length
 
@@ -220,8 +227,6 @@ class class_text_buffer(object):
 				self.__send_html_count += 1
 		elif self.__config.ftp_debug:
 			print("Debug on but No Ftp Creds File Found")
-		else:
-			print("No FTP Creds File send count is :", self.__send_html_count)
 		return
 
 
