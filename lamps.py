@@ -56,14 +56,43 @@ Error_Text = ""
 
 
 try:
+#	bright_pi.reset()
+#	print("IR off White ON")
+#	bright_pi.WHITE_on()
+#	time.sleep(20)
+#	bright_pi.reset()
+#	print("all off")
+	
+
+#	print ("IR On")
+#	bright_pi.IR_on()
+#	time.sleep(20)
+#	bright_pi.reset()
+#	print("IR off White ON")
+#	bright_pi.WHITE_on()
+#	time.sleep(10)
+#	bright_pi.reset()
+#	print("all off")
+	
+#	bright_pi.reset()
+#	print ("IR On")
+#	bright_pi.IR_on()
+#	time.sleep(20)
+#	bright_pi.reset()
+#	print("IR off White ON")
+#	bright_pi.WHITE_on()
+#	time.sleep(10)
+#	bright_pi.reset()
+#	print("all off")
+
 	bright_pi.reset()
 	print ("IR On")
 	bright_pi.IR_on()
-	time.sleep(2)
+	time.sleep(20)
 	bright_pi.reset()
 	print("IR off White ON")
 	bright_pi.WHITE_on()
-	time.sleep(2)
+	time.sleep(10)
 	bright_pi.reset()
 	print("all off")
 except:
@@ -79,15 +108,17 @@ while (config.scan_count <= config.max_scans) or (config.max_scans == 0):
 		cpu.get_data()
 		# print(rise_set.datetime_now.strftime(' Time is :  %H hrs %M min'))
 		if rise_set.night:
-			# print("Its Night Time Turn IR On \n")
+			print("Its Night Time Turn IR On")
 			try:
 				bright_pi.IR_on()
+				log_buffer.line_values[6] = "On"
 			except:
 				Error_Text = Error_Text + " IR On Fail,"
 		else:
-			# print("Its Day Time Turn IR Off \n")
+			print("Its Day Time Turn IR Off")
 			try:
 				bright_pi.reset()
+				log_buffer.line_values[6] = "Off"
 			except:
 				Error_Text = Error_Text + " IR Off Fail,"			
 		time.sleep(config.scan_delay)
@@ -98,10 +129,7 @@ while (config.scan_count <= config.max_scans) or (config.max_scans == 0):
 		log_buffer.line_values[3] = str(cpu.cpu_freq.current/1000)
 		log_buffer.line_values[4] = str(cpu.cpu_mem) 
 		log_buffer.line_values[5] = str(cpu.cpu_disk)
-		if rise_set.night:
-			log_buffer.line_values[6] = "On"
-		else:
-			log_buffer.line_values[6] = "Off"
+
 		log_buffer.line_values[7] = str(round(rise_set.next_rise_time,2))
 		log_buffer.line_values[8] = str(round(rise_set.next_set_time,2))
 		log_buffer.line_values[9] = Error_Text
