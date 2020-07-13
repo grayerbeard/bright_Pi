@@ -22,7 +22,6 @@
 #  
 #  
 from datetime import datetime, timedelta
-from bright_pi_lamps import class_bright_pi_lamps
 import ephem 
 import time
 
@@ -33,33 +32,29 @@ class class_rise_set():
 		self.__observer.lat=str(self.__config.latitude)  
 		self.__observer.long=str(self.__config.longitude)  
 		self.__sun=ephem.Sun()
-		self.bright_pi = class_bright_pi_lamps()
-		self.datetime_now = datetime.now()
-		self.time_used = self.datetime_now
+		self.time_used = datetime.now()
+		self.__observer.date = self.time_used
 	def compute(self,test_offset_hours):
+		self.time_used = datetime.now() + timedelta(hours = test_offset_hours)
+		self.__observer.date = self.time_used
 		self.__sun.compute()
 		self.__next_rise = ephem.localtime(self.__observer.next_rising(self.__sun))
 		self.__next_set = ephem.localtime(self.__observer.next_setting(self.__sun))
-		self.datetime_now = datetime.now()
-		self.time_used = self.datetime_now + timedelta(hours = test_offset_hours)
 		self.next_set_time = (self.__next_set - self.time_used).total_seconds()/60/60
-		if self.next_set_time < 0 : self.next_set_time = self.next_set_time + 24
 		self.next_rise_time = (self.__next_rise - self.time_used).total_seconds()/60/60
-		if self.next_rise_time < 0 : self.next_rise_time = self.next_rise_time + 24
 		if self.next_set_time < self.next_rise_time:
 			self.night = False
 		else:
 			self.night = True
 
-	def test_timing_calc(self):
-		for hours_to_add in range(0,26,1):
-			print("In " + str(hours_to_add) +  self.time_used.strftime(' hours at :  %H hrs %M min'))
-			self.compute(hours_to_add,True)
+	def test_timing_calc(self,hours_ahead,step):
+		for hours_to_add in range(0,hours_ahead,step):
+			self.compute(hours_to_add)			
+			print("In ", str(hours_to_add),' hours at : ',self.__observer.date)
+			print("next_set_time in : ",self.next_set_time," hours and next_rise_time in : ",self.next_rise_time, " hours")
 			if self.night:
-				print("Its Night Time Turn IR On \n")
-				self.bright_pi.IR_on()
+				print("It will be Night Time so would Turn IR On \n")
 			else:
-				print("Its Day Time Turn IR Off \n")
-				self.bright_pi.reset()
-			time.sleep(0.25)
+				print("It will be  Day Time so would Turn IR Off \n")
+			time.sleep(0.1)
 

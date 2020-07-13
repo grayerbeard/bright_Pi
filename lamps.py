@@ -91,18 +91,19 @@ if config.lamps_control:
 		bright_pi.reset()
 		print ("IR On")
 		bright_pi.IR_on()
-		time.sleep(20)
+		time.sleep(2)
 		bright_pi.reset()
 		print("IR off White ON")
 		bright_pi.WHITE_on()
-		time.sleep(10)
+		time.sleep(1)
 		bright_pi.reset()
 		print("all off")
 	except:
 		Error_Text = Error_Text + " Lamp Test Fail,"
 
-# Following line for test only
-# rise_set.test_timing_calc()
+# Following two line for test only, comment out when not needed
+rise_set.test_timing_calc(140,2)
+sys_exit()
 
 while (config.scan_count <= config.max_scans) or (config.max_scans == 0):
 	try:
