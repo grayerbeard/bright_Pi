@@ -57,78 +57,44 @@ bright_pi = class_bright_pi_lamps()
 cpu = class_cpu()
 Error_Text = ""
 
-if config.lamps_control:
-	try:
-	#	bright_pi.reset()
-	#	print("IR off White ON")
-	#	bright_pi.WHITE_on()
-	#	time.sleep(20)
-	#	bright_pi.reset()
-	#	print("all off")
-		
-
-	#	print ("IR On")
-	#	bright_pi.IR_on()
-	#	time.sleep(20)
-	#	bright_pi.reset()
-	#	print("IR off White ON")
-	#	bright_pi.WHITE_on()
-	#	time.sleep(10)
-	#	bright_pi.reset()
-	#	print("all off")
-	
-	#	bright_pi.reset()
-	#	print ("IR On")
-	#	bright_pi.IR_on()
-	#	time.sleep(20)
-	#	bright_pi.reset()
-	#	print("IR off White ON")
-	#	bright_pi.WHITE_on()
-	#	time.sleep(10)
-	#	bright_pi.reset()
-	#	print("all off")
-
-		bright_pi.reset()
-		print ("IR On")
-		bright_pi.IR_on()
-		time.sleep(2)
-		bright_pi.reset()
-		print("IR off White ON")
-		bright_pi.WHITE_on()
-		time.sleep(1)
-		bright_pi.reset()
-		print("all off")
-	except:
-		Error_Text = Error_Text + " Lamp Test Fail,"
+# following lines will test lamps if required
+#if config.lamps_control:
+#	try:
+#		bright_pi.reset()
+#		print ("IR On")
+#		bright_pi.IR_on()
+#		time.sleep(2)
+#		bright_pi.reset()
+#		print("IR off White ON")
+#		bright_pi.WHITE_on()
+#		time.sleep(1)
+#		bright_pi.reset()
+#		print("all off")
+#	except:
+#		Error_Text = Error_Text + " Lamp Test Fail,"
 
 # Following two line for test only, comment out when not needed
-rise_set.test_timing_calc(140,2)
-sys_exit()
+# rise_set.test_timing_calc(140,2)
+# sys_exit()
 
 while (config.scan_count <= config.max_scans) or (config.max_scans == 0):
 	try:
 		config.scan_count += 1
+		# Can also test by replacing number instead of zero in following line to offset hours in future
 		rise_set.compute(0)
 		cpu.get_data()
-		# print(rise_set.datetime_now.strftime(' Time is :  %H hrs %M min'))
 		if rise_set.night and config.lamps_control:
-			# Following l;ine for debugging only
-			# print("Its Night Time Turn IR On")
 			try:
 				bright_pi.IR_on()
 				log_buffer.line_values[6] = "On"
 			except:
 				Error_Text = Error_Text + " IR On Fail,"
 		elif config.lamps_control:
-			# Following l;ine for debugging only
-			# print("Its Day Time Turn IR Off")
 			try:
 				bright_pi.reset()
 				log_buffer.line_values[6] = "Off"
 			except:
-				Error_Text = Error_Text + " IR Off Fail,"			
-		time.sleep(config.scan_delay)
-		# print(datetime.now().strftime(' Time is :  %H hrs %M min'))
+				Error_Text = Error_Text + " IR Off Fail,"
 		log_buffer.line_values[0] = str(config.scan_count)
 		log_buffer.line_values[1] = str(cpu.cpu_load)
 		log_buffer.line_values[2] = str(round(cpu.temp,2) ) 
@@ -143,7 +109,9 @@ while (config.scan_count <= config.max_scans) or (config.max_scans == 0):
 			Error_Text = ""
 		
 		buffer_increment_flag = True
-		log_buffer.pr(buffer_increment_flag,0,rise_set.datetime_now,1234)
+		log_buffer.pr(buffer_increment_flag,0,rise_set.time_used,1234)
+		
+		time.sleep(config.scan_delay)
 
 	except KeyboardInterrupt:
 		print(".........Ctrl+C pressed...")
